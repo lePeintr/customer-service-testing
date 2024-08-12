@@ -1,0 +1,131 @@
+
+1) Vérifier le Code HTTP
+Pour vérifier que la réponse HTTP a un code de statut spécifique, vous pouvez utiliser le code suivant :
+
+pm.test("Status code is 200", function () {
+    pm.response.to.have.status(200);
+});
+
+2. Vérifier la Structure JSON avec un Schéma
+Vous pouvez utiliser JSON Schema pour valider la structure de la réponse JSON. Voici un exemple de test avec un schéma JSON :
+
+STRUCTURE DU SCHEMA JSON POUR VALIDATION EXEMPLE AVEC UN OBJET JSON
+const customerSchema = {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "integer"
+        },
+        "firstName": {
+            "type": "string"
+        },
+        "lastName": {
+            "type": "string"
+        },
+        "email": {
+            "type": "string"
+        }
+    },
+    "required": ["id", "firstName", "lastName", "email"]
+};
+
+const listCustomerSchema = {
+    "type": "array",
+    "items": {
+        "type": "object",
+        "properties": {
+            "id": {
+                "type": "integer"
+            },
+            "firstName": {
+                "type": "string"
+            },
+            "lastName": {
+                "type": "string"
+            },
+            "email": {
+                "type": "string"
+            }
+        },
+        "required": ["id", "firstName", "lastName", "email"]
+    }
+};
+
+pm.test("Response matches customer schema", function () {
+    pm.response.to.have.jsonSchema(customerSchema);
+});
+
+3. Vérifier les Types de Données
+Pour vérifier les types de données dans la réponse JSON, vous pouvez écrire des tests comme suit :
+
+pm.test("Response has valid data types", function () {
+    const jsonData = pm.response.json();
+
+    pm.expect(jsonData.id).to.be.a('number');
+    pm.expect(jsonData.firstName).to.be.a('string');
+    pm.expect(jsonData.lastName).to.be.a('string');
+    pm.expect(jsonData.email).to.be.a('string');
+});
+
+4. Vérifier des Champs Spécifiques
+Pour vérifier que des champs spécifiques dans la réponse sont présents et ont des valeurs attendues :
+
+pm.test("Response contains the correct fields", function () {
+    const jsonData = pm.response.json();
+
+    pm.expect(jsonData).to.have.property('id');
+    pm.expect(jsonData).to.have.property('firstName');
+    pm.expect(jsonData).to.have.property('lastName');
+    pm.expect(jsonData).to.have.property('email');
+});
+
+pm.test("firstName is not empty", function () {
+    const jsonData = pm.response.json();
+
+    pm.expect(jsonData.firstName).to.not.be.empty;
+});
+
+5. Vérifier le Contenu de la Réponse
+Pour vérifier que la réponse contient des valeurs spécifiques :
+
+pm.test("Response contains expected values", function () {
+    const jsonData = pm.response.json();
+
+    pm.expect(jsonData.firstName).to.eql("vini");
+    pm.expect(jsonData.lastName).to.eql("junior");
+});
+
+6. Vérifier la Structure des Listes
+Si la réponse contient des listes, vous pouvez vérifier leur structure :
+
+pm.test("Response array has the correct length", function () {
+    const jsonData = pm.response.json();
+
+    pm.expect(jsonData.customers).to.be.an('array').that.has.lengthOf(3);
+});
+
+pm.test("Each customer has expected properties", function () {
+    const jsonData = pm.response.json();
+
+    jsonData.customers.forEach(customer => {
+        pm.expect(customer).to.have.all.keys('id', 'firstName', 'lastName', 'email');
+    });
+});
+
+
+
+
+
+PIPELINE STYLE SCRIPT
+node{
+    def mvnHome
+    stage('Checkout'){
+        git 'https://github.com/lePeintr/customer-service-testing'
+
+        mvnHome = 'C:\apache-maven-3.9.8-bin\apache-maven-3.9.8'
+    }
+    stage('Build'){
+         sh "'${mvnHome}/bin/mvn' clean install"
+    }
+}
